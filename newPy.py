@@ -23,27 +23,38 @@ class Customer:
 
 
 class Simulation:
-    meanIntervalTime = 1
-    meanServiceTime = .5
-    totalCustomers = 1000
-
-    simTime = 0
-    qSize = 0
-    serverState = ServerState.IDLE
-    customers = []
-
-    arrived = 0
-    completed = 0
 
     infinite = 1000000000000
 
-    inServerCustomer = -1
-    nextDepartTime = 0
 
-    totalDelay = 0
-    totalNumberInQ = 0
-    prevQTime = 0
-    totalServerUtilization = 0
+    def __init__(self, meanIntervalTime, meanServiceTime, noOfCustomers):
+        self.meanIntervalTime = meanIntervalTime
+        self.meanServiceTime = meanServiceTime
+        self.totalCustomers = noOfCustomers
+
+        self.simTime = 0
+        self.qSize = 0
+        self.serverState = ServerState.IDLE
+        self.customers = []
+
+        self.arrived = 0
+        self.completed = 0
+
+
+        self.inServerCustomer = -1
+        self.nextDepartTime = 0
+
+        self.totalDelay = 0
+        self.totalNumberInQ = 0
+        self.prevQTime = 0
+        self.totalServerUtilization = 0
+        self.averageDelay = 0
+        self.averageNoInQ = 0
+
+        self.initialize()
+        self.triggerEvent()
+        self.averageDelay = self.totalDelay/self.totalCustomers
+        self.averageNoInQ = self.totalNumberInQ/self.simTime
 
     def getRandomValue(self, mean):
         return -mean*math.log(random.random())
@@ -115,16 +126,40 @@ class Simulation:
         self.serverState = ServerState.IDLE
         self.arrived = 0
 
+    def showReport(self, out):
+        out.write("Single-Server queueing system:\n")
+        out.write("Mean interrarival time: " + str(self.meanIntervalTime) + "\n")
+        out.write("Mean Service Time: " + str(self.meanServiceTime) + "\n")
+        out.write("Number of customers: " + str(self.totalCustomers) + "\n\n")
 
-sim = Simulation()
-sim.initialize()
-sim.triggerEvent()
-print(sim.totalDelay/sim.totalCustomers)
-print(sim.totalNumberInQ/sim.simTime)
-print(sim.totalServerUtilization)
-print(sim.simTime)
-# initialize()
-# triggerEvent()
-# print(totalDelay/totalCustomers)
-# print(totalNumberInQ/simTime)
-# print(totalServerUtilization)
+        out.write("Average delay in queue: " + str(round(self.averageDelay, 3)) + "\n")
+        out.write("Average number in queue: " + str(round(self.averageNoInQ, 3)) + "\n")
+        out.write("Server utilization: " + str(round(self.totalServerUtilization, 3)) + "\n")
+        out.write("Time simulation ended: " + str(round(self.simTime, 3)) + "\n")
+
+
+input = open("in.txt")
+meanInterarrivalTime = float(input.readline())
+meanServiceTime = float(input.readline())
+totalCustomers = int(input.readline())
+input.close()
+
+sim = Simulation(meanInterarrivalTime, meanServiceTime, totalCustomers)
+
+out = open("out.txt", "w")
+out.write("a) \n")
+sim.showReport(out)
+
+out.write("b.\n")
+
+out.close()
+
+csv = open("b.csv", "w")
+csv.write("k,Avg. Delay,Avg. No.,Server Util.,Simlation Time\n")
+ks = [.5, .6, .7, .8, .9]
+for i in range(len(ks)):
+    kSim = Simulation(meanInterarrivalTime, meanInterarrivalTime*ks[i], totalCustomers)
+    csv.write(str(ks[i])+",")
+    csv.write(str(round(kSim.averageDelay, 3)) + "," + str(round(kSim.averageNoInQ, 3)) + "," + 
+        str(round(kSim.totalServerUtilization, 3)) + "," + str(round(kSim.simTime, 3)) + "\n")
+csv.close()
