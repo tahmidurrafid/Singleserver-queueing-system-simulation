@@ -4,28 +4,28 @@ Mean interrarival time: 1.0
 Mean Service Time: 0.5
 Number of customers: 1000
 
-Average delay in queue: 0.59
-Average number in queue: 0.613
-Server utilization: 495.013
-Time simulation ended: 962.783
+Average delay in queue: 0.41
+Average number in queue: 0.415
+Server utilization: 487.914
+Time simulation ended: 988.458
 
 
 c.
 Exponential distribution for beta = 1.0
 
-Min: 0.0006741
-Max: 12.4796615
-Median: 0.6710588
+Min: 0.0021777
+Max: 11.8378758
+Median: 0.6997828
 
 Exponential distribution for beta = 0.5
 
-Min: 0.000647
-Max: 4.0100642
-Median: 0.3362107
+Min: 3.36e-05
+Max: 3.3529771
+Median: 0.3467973
 
 Uniform distribution
 
-Min: 3.8e-06
-Max: 0.9993262
-Median: 0.511169
+Min: 7.2e-06
+Max: 0.9978247
+Median: 0.4966932
 

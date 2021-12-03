@@ -22,9 +22,6 @@ class Customer:
         self.arrivalInterval = arrivalInterval
         self.intervalRand = intervalRand
         self.serviceTimeRand = serviceTimeRand
-    def printCustomer():
-        print("This is me")
-
 
 class Simulation:
 
@@ -154,7 +151,7 @@ class Simulation:
             values.append(self.customers[i].arrivalInterval)
         self.computeDistribution(values, self.meanIntervalTime, "x", 
             "P(x)", "Exponential distribution for beta = " + str(self.meanIntervalTime), out)
-        # plt.show()
+        plt.show()
 
         values = []
         plt.title("Exponential distribution")
@@ -186,7 +183,7 @@ class Simulation:
         x = [mean/2, mean, 2*mean, 3*mean]
         if(uniform == True):
             x = []
-            for i in range(1, 10):
+            for i in range(1, 11):
                 x.append(i/10)
         y = []
         for i in range (0, len(x)):
@@ -199,12 +196,25 @@ class Simulation:
                 index += 1
                 if index >= len(x):
                     break
+        total = 0                
+        for i in range(0, len(y)):
+            interval = x[i] - (0 if i == 0 else x[i-1])
+            y[i] = y[i]/interval
+            total += y[i]*interval
+
+        # for i in range(0, len(y)):
+        #     total += y[i]
+        for i in range(0, len(y)):
+            y[i] = y[i]/total
+        
         plt.plot(x, y, label = title)
         plt.xlabel(xLabel)
         plt.ylabel(yLabel)
         plt.title(title)
         for i in range(1, len(y)):
             y[i] += y[i-1]
+        for i in range(0, len(y)):
+            y[i] = y[i]/y[len(y)-1]
         plt.plot(x, y, label = "Cumulative " + title)
         plt.legend()
 
