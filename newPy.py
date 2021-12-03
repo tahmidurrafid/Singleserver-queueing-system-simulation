@@ -2,6 +2,8 @@ import math
 import random
 import enum
 import sys
+import matplotlib.pyplot as plt
+
 sys.setrecursionlimit(10000)
 
 class ServerState(enum.Enum):
@@ -14,10 +16,12 @@ class EventType(enum.Enum):
     FINISHED = 3
 
 class Customer:
-    def __init__(self, arrival, service, arrivalInterval):
+    def __init__(self, arrival, service, arrivalInterval, intervalRand, serviceTimeRand):
         self.arrivalTime = arrival
         self.serviceTime = service
         self.arrivalInterval = arrivalInterval
+        self.intervalRand = intervalRand
+        self.serviceTimeRand = serviceTimeRand
     def printCustomer():
         print("This is me")
 
@@ -56,8 +60,8 @@ class Simulation:
         self.averageDelay = self.totalDelay/self.totalCustomers
         self.averageNoInQ = self.totalNumberInQ/self.simTime
 
-    def getRandomValue(self, mean):
-        return -mean*math.log(random.random())
+    def getRandomValue(self, mean, x):
+        return -mean*math.log(x)
 
     def queueUp(self):
         self.totalNumberInQ += (self.simTime - self.prevQTime)*self.qSize
@@ -117,11 +121,17 @@ class Simulation:
         arrivalTime = 0
         interval = 0
         totalServiceTime = 0
+        intervalRand = 0
+        serviceTimeRand = 0
         for i in range(0, self.totalCustomers):
-            serviceTime = self.getRandomValue(self.meanServiceTime)
+            serviceTimeRand = random.random()
+            serviceTime = self.getRandomValue(self.meanServiceTime, serviceTimeRand)
+
+            intervalRand = random.random()
+            interval = self.getRandomValue(self.meanIntervalTime, intervalRand)            
+
             totalServiceTime += serviceTime
-            self.customers.append(Customer(arrivalTime, serviceTime, interval))
-            interval = self.getRandomValue(self.meanIntervalTime)
+            self.customers.append(Customer(arrivalTime, serviceTime, interval, intervalRand, serviceTimeRand))
             arrivalTime += interval
         self.serverState = ServerState.IDLE
         self.arrived = 0
@@ -135,8 +145,45 @@ class Simulation:
         out.write("Average delay in queue: " + str(round(self.averageDelay, 3)) + "\n")
         out.write("Average number in queue: " + str(round(self.averageNoInQ, 3)) + "\n")
         out.write("Server utilization: " + str(round(self.totalServerUtilization, 3)) + "\n")
-        out.write("Time simulation ended: " + str(round(self.simTime, 3)) + "\n")
+        out.write("Time simulation ended: " + str(round(self.simTime, 3)) + "\n\n\n")
 
+    def showStatistics(self, out):
+        values = []
+        for i in range (0, self.totalCustomers):
+            values.append(self.customers[i].arrivalInterval)
+        self.computeDistribution(values, self.meanIntervalTime, "x", "P(x)", "Exponential distribution")
+        values = []
+        for i in range (0, self.totalCustomers):
+            values.append(self.customers[i].intervalRand)
+        self.computeDistribution(values, self.meanIntervalTime, "x", "P(x)", "Uniform distribution")
+        plt.show()
+        
+    def computeDistribution(self, values, mean, xLabel, yLabel, title):
+        values.sort()
+        median = 0
+        if(len(values)%2 == 1):
+            median = values[len(values)//2]
+        else:
+            median = (values[(len(values)-1)//2] + values[len(values)//2])/2 
+        min = values[0]
+        max = values[len(values)-1]
+        print(min)
+        print(max)
+        print(median)
+        x = [mean/2, mean, 2*mean, 3*mean]
+        y = [0, 0, 0, 0]
+        index = 0
+        for i in range(0, len(values)):
+            if values[i] <= x[index]:
+                y[index] += 1
+            else:
+                index += 1
+                if index >= len(x):
+                    break
+        plt.plot(x, y)
+        plt.xlabel(xLabel)
+        plt.ylabel(yLabel)
+        plt.title(title)
 
 input = open("in.txt")
 meanInterarrivalTime = float(input.readline())
@@ -151,6 +198,8 @@ out.write("a) \n")
 sim.showReport(out)
 
 out.write("b.\n")
+
+sim.showStatistics(out)
 
 out.close()
 

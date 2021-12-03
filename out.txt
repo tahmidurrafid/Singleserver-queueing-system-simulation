@@ -4,8 +4,10 @@ Mean interrarival time: 1.0
 Mean Service Time: 0.5
 Number of customers: 1000
 
-Average delay in queue: 0.507
-Average number in queue: 0.546
-Server utilization: 501.02
-Time simulation ended: 928.637
+Average delay in queue: 0.397
+Average number in queue: 0.375
+Server utilization: 481.877
+Time simulation ended: 1057.335
+
+
 b.
