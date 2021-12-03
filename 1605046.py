@@ -149,16 +149,28 @@ class Simulation:
 
     def showStatistics(self, out):
         values = []
+        plt.title("Exponential distribution")
         for i in range (0, self.totalCustomers):
             values.append(self.customers[i].arrivalInterval)
-        self.computeDistribution(values, self.meanIntervalTime, "x", "P(x)", "Exponential distribution")
+        self.computeDistribution(values, self.meanIntervalTime, "x", 
+            "P(x)", "Exponential distribution for beta = " + str(self.meanIntervalTime), out)
+        # plt.show()
+
+        values = []
+        plt.title("Exponential distribution")
+        for i in range (0, self.totalCustomers):
+            values.append(self.customers[i].serviceTime)
+        self.computeDistribution(values, self.meanServiceTime, "x", 
+            "P(x)", "Exponential distribution for beta = " + str(self.meanServiceTime), out)
+        plt.show()
+
         values = []
         for i in range (0, self.totalCustomers):
             values.append(self.customers[i].intervalRand)
-        self.computeDistribution(values, self.meanIntervalTime, "x", "P(x)", "Uniform distribution")
+        self.computeDistribution(values, self.meanIntervalTime, "x", "P(x)", "Uniform distribution", out, True)
         plt.show()
-        
-    def computeDistribution(self, values, mean, xLabel, yLabel, title):
+
+    def computeDistribution(self, values, mean, xLabel, yLabel, title, out,uniform = False):
         values.sort()
         median = 0
         if(len(values)%2 == 1):
@@ -167,11 +179,18 @@ class Simulation:
             median = (values[(len(values)-1)//2] + values[len(values)//2])/2 
         min = values[0]
         max = values[len(values)-1]
-        print(min)
-        print(max)
-        print(median)
+        out.write(title + "\n\n")
+        out.write("Min: " + str(round(min, 7)) + "\n")
+        out.write("Max: " + str(round(max, 7)) + "\n")
+        out.write("Median: " + str(round(median, 7)) + "\n\n")
         x = [mean/2, mean, 2*mean, 3*mean]
-        y = [0, 0, 0, 0]
+        if(uniform == True):
+            x = []
+            for i in range(1, 10):
+                x.append(i/10)
+        y = []
+        for i in range (0, len(x)):
+            y.append(0)
         index = 0
         for i in range(0, len(values)):
             if values[i] <= x[index]:
@@ -180,10 +199,14 @@ class Simulation:
                 index += 1
                 if index >= len(x):
                     break
-        plt.plot(x, y)
+        plt.plot(x, y, label = title)
         plt.xlabel(xLabel)
         plt.ylabel(yLabel)
         plt.title(title)
+        for i in range(1, len(y)):
+            y[i] += y[i-1]
+        plt.plot(x, y, label = "Cumulative " + title)
+        plt.legend()
 
 input = open("in.txt")
 meanInterarrivalTime = float(input.readline())
@@ -197,7 +220,7 @@ out = open("out.txt", "w")
 out.write("a) \n")
 sim.showReport(out)
 
-out.write("b.\n")
+out.write("c.\n")
 
 sim.showStatistics(out)
 
